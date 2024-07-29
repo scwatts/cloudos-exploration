@@ -33,17 +33,36 @@ process INFO {
   """
 }
 
+process RETRIEVE() {
+  container 'quay.io/bioconda/base-glibc-busybox-bash:2.1.0'
+
+  publishDir 'output/'
+
+  input:
+  path fastq_gz
+
+  output:
+  path "fastq.head.txt"
+
+  script:
+  """
+  gzip -cd ${fastq_gz} | head -n8 > fastq.head.txt
+  """
+}
+
 workflow {
-  INFO()
+  //INFO()
 
-  [
-    "/home/ec2-user/.nextflow/config",
-    "/home/job/multidocker.config",
-    "/home/job/aws.config",
-    "/Users/stephen/repos/cloudos-exploration/nextflow.config",
-  ]
-    .each { dump_config(it) }
+  //[
+  //  "/home/ec2-user/.nextflow/config",
+  //  "/home/job/multidocker.config",
+  //  "/home/job/aws.config",
+  //  "/Users/stephen/repos/cloudos-exploration/nextflow.config",
+  //]
+  //  .each { dump_config(it) }
 
+  fastq_gz = file(params.fastq_gz)
+  RETRIEVE(fastq_gz)
 }
 
 def dump_config(fp_str) {
